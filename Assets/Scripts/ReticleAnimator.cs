@@ -2,38 +2,32 @@ using UnityEngine;
 
 public class ReticleAnimator : MonoBehaviour
 {
-    [Tooltip("Velocidad a la que gira el ret韈ulo")]
-    public float rotationSpeed = 90f; // Gira 90 grados cada segundo
+    [Header("Cinem谩tica de Rotaci贸n")]
+    [Tooltip("Velocidad angular de rotaci贸n en el eje Y (grados por segundo).")]
+    public float rotationSpeed = 90f; 
 
-    [Tooltip("Velocidad a la que crece y encoge")]
+    [Header("Cinem谩tica de Escala (Feedback Visual)")]
+    [Tooltip("Frecuencia de la interpolaci贸n sinusoidal de la escala.")]
     public float scaleSpeed = 3f;
 
-    [Tooltip("Cu醤to crece y encoge")]
+    [Tooltip("Amplitud m谩xima de la deformaci贸n volum茅trica.")]
     public float scaleAmount = 0.2f;
 
-    // Variable interna para recordar el tama駉 original
     private Vector3 originalScale;
 
     void Start()
     {
-        // Nada m醩 empezar, guardamos el tama駉 original del ret韈ulo
-        // para no deformarlo al hacerlo latir.
+        // Almacenamos la escala base para garantizar que la transformaci贸n posterior sea relativa y no destructiva
         originalScale = transform.localScale;
     }
 
     void Update()
     {
-        // 1. HACER QUE GIRE
-        // Vector3.up es el eje Y (hacia arriba). 
-        // Time.deltaTime hace que gire suavemente sin importar los FPS de tu ordenador.
         transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime);
 
-        // 2. HACER QUE PALPITE (ESCALA)
-        // Mathf.Sin crea una onda matem醫ica que sube y baja constantemente con el tiempo.
-        // Esto nos da un modificador que hace el efecto de "latido".
+        // Aplicaci贸n de una funci贸n trigonom茅trica para generar un efecto de pulso continuo (retroalimentaci贸n pasiva)
         float scaleModifier = Mathf.Sin(Time.time * scaleSpeed) * scaleAmount;
 
-        // Le sumamos ese latido al tama駉 original en los ejes X, Y y Z.
         transform.localScale = originalScale + new Vector3(scaleModifier, scaleModifier, scaleModifier);
     }
 }
