@@ -6,18 +6,18 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public class SortingGameManager : MonoBehaviour
 {
-    [Header("UI & Puntos")]
-    public TMP_Text scoreText; // Arrastra TextoPuntaje aqu�
+    [Header("Interfaz y Métricas de Progreso")]
+    public TMP_Text scoreText; 
     public int currentScore = 0;
     private const int maxScore = 6;
 
-    [Header("Sonidos")]
-    public AudioSource audioSource; // Necesario para reproducir sonido
-    public AudioClip correctSound; // Sonido de acierto
-    public AudioClip wrongSound; // Sonido de error
+    [Header("Retroalimentación Auditiva")]
+    public AudioSource audioSource; 
+    public AudioClip correctSound; 
+    public AudioClip wrongSound; 
 
-    [Header("Resultados")]
-    public DoorOpener doorOpener; // Arrastra el objeto con el script de la puerta
+    [Header("Eventos de Transición")]
+    public DoorOpener doorOpener; 
 
     void Start()
     {
@@ -29,63 +29,54 @@ public class SortingGameManager : MonoBehaviour
         scoreText.text = "Puntos: " + currentScore + "/" + maxScore;
     }
 
-    // --- FUNCIONES PÚBLICAS PARA EL CUBO ROJO ---
-
-    // Llamado cuando algo entra en el Socket Rojo
+    // --- CALLBACKS DE VALIDACIÓN: CONTENEDOR ROJO ---
     public void OnObjectDroppedInRedSocket(SelectEnterEventArgs args)
     {
-        // En Unity 6 sacamos el GameObject real desde los "args" (argumentos)
+        // Extracción de la referencia al GameObject interactuado desde el evento del XR Socket
         GameObject itemDropped = args.interactableObject.transform.gameObject;
 
-        // LÓGICA CORRECTA: Pelota en Rojo
+        // Validación de categorización mediante etiquetas espaciales (Target: Pelotas)
         if (itemDropped.CompareTag("Pelotas"))
         {
             Action_CorrectEntry(itemDropped);
         }
-        // LÓGICA INCORRECTA: Cualquier otra cosa (Libro u Untagged)
         else
         {
             Action_WrongEntry(itemDropped);
         }
     }
 
-    // --- FUNCIONES PÚBLICAS PARA EL CUBO AZUL ---
-
+    // --- CALLBACKS DE VALIDACIÓN: CONTENEDOR AZUL ---
     public void OnObjectDroppedInBlueSocket(SelectEnterEventArgs args)
     {
         GameObject itemDropped = args.interactableObject.transform.gameObject;
 
-        // LÓGICA CORRECTA: Libro en Azul
+        // Validación de categorización mediante etiquetas espaciales (Target: Libros)
         if (itemDropped.CompareTag("Libros"))
         {
             Action_CorrectEntry(itemDropped);
         }
-        // LÓGICA INCORRECTA: Cualquier otra cosa (Pelota u Untagged)
         else
         {
             Action_WrongEntry(itemDropped);
         }
     }
 
-
-    // --- ACCIONES GENERALES ---
+    // --- MÉTODOS DE RESOLUCIÓN LÓGICA ---
 
     private void Action_CorrectEntry(GameObject item)
     {
-        // 1. Sonido acierto
         if (audioSource && correctSound) audioSource.PlayOneShot(correctSound);
 
-        // 2. Desaparece del cubo/escena (lo desactivamos)
+        // Desactivamos el renderizado y las físicas del objeto una vez categorizado correctamente
         item.SetActive(false);
 
-        // 3. Sube un punto y actualiza UI
         currentScore++;
         UpdateScoreUI();
 
-        // 4. Comprobar si hemos ganado
+        // Verificación de la condición de victoria para la apertura de la siguiente fase
         if (currentScore >= maxScore)
         {
-            // --- AÑADIMOS SOLO LA LÍNEA DEL TEXTO AQUÍ ---
             scoreText.text = "¡Perfecto! ¡Ahora puedes ir a la siguiente habitación!";
 
             if (doorOpener != null)
@@ -97,10 +88,9 @@ public class SortingGameManager : MonoBehaviour
 
     private void Action_WrongEntry(GameObject item)
     {
-        // 1. Sonido error
         if (audioSource && wrongSound) audioSource.PlayOneShot(wrongSound);
 
-        // 2. Vuelve a su sitio de origen
+        // Restauración espacial del objeto para evitar frustración o bloqueos cognitivos en el paciente
         ItemReturner returner = item.GetComponent<ItemReturner>();
         if (returner != null)
         {
@@ -108,7 +98,7 @@ public class SortingGameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("El objeto equivocado " + item.name + " no tiene ItemReturner script, no puede volver.");
+            Debug.LogWarning($"Validación: El objeto '{item.name}' carece del componente ItemReturner para su restauración espacial.");
         }
     }
 }
