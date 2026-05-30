@@ -1,22 +1,23 @@
 using UnityEngine;
-using UnityEngine.Video; // ¡Esta línea es nueva y obligatoria para usar vídeos!
+using UnityEngine.Video;
 
 public class DetectorTele : MonoBehaviour
 {
-    [Header("Conexiones")]
+    [Header("Dependencias del Sistema")]
     public SalonGameManager gameManager;
 
-    [Tooltip("Arrastra aquí el objeto Screen que tiene el Video Player")]
+    [Header("Componentes Multimedia")]
+    [Tooltip("Referencia al reproductor de vÃ­deo integrado en la pantalla")]
     public VideoPlayer reproductorVideo;
 
     private bool yaEncendida = false;
 
     void Update()
     {
-        // Si la tele no estaba encendida, pero de repente el VÍDEO empieza a reproducirse...
+        // Evaluamos el cambio de estado del reproductor para registrar la acciÃ³n una Ãºnica vez
         if (!yaEncendida && reproductorVideo != null && reproductorVideo.isPlaying)
         {
-            yaEncendida = true; // Marcamos que ya está encendida
+            yaEncendida = true;
 
             if (gameManager != null)
             {
