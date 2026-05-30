@@ -1,10 +1,14 @@
 using UnityEngine;
-using System.Collections; // Necesario para Coroutines
+using System.Collections;
 
 public class DoorOpener : MonoBehaviour
 {
-    public float targetYRotationMovement = 88f; // Cuántos grados mover en Y
-    public float openingSpeed = 2f; // Velocidad de la animación (grados por segundo * multiplicador)
+    [Header("CinemÃ¡tica de la Puerta")]
+    [Tooltip("Desplazamiento angular objetivo en el eje Y (grados)")]
+    public float targetYRotationMovement = 88f; 
+    
+    [Tooltip("Velocidad o multiplicador para la interpolaciÃ³n de apertura")]
+    public float openingSpeed = 2f; 
 
     private bool doorIsOpening = false;
     private Quaternion closedRotation;
@@ -12,15 +16,13 @@ public class DoorOpener : MonoBehaviour
 
     void Start()
     {
-        // Guardamos la rotación inicial de la puerta como "Cerrada"
-        closedRotation = transform.localRotation; // Usamos LOCAL para que no dependa de hacia dónde mira la habitación
+        // Almacenamos la rotaciÃ³n en espacio local para independizar la cinemÃ¡tica de la orientaciÃ³n global de la sala
+        closedRotation = transform.localRotation; 
 
-        // Calculamos la rotación "Abierta" sumando el movimiento en Y
-        // Esto añade +88 grados a la rotación Y actual
+        // CÃ¡lculo del cuaterniÃ³n objetivo mediante la composiciÃ³n de rotaciones
         openRotation = closedRotation * Quaternion.Euler(0, targetYRotationMovement, 0);
     }
 
-    // Función pública que llamará el Manager
     public void OpenDoor()
     {
         if (!doorIsOpening)
@@ -33,18 +35,17 @@ public class DoorOpener : MonoBehaviour
     {
         doorIsOpening = true;
         float elapsedTime = 0f;
-        float duration = 2.0f; // Tiempo que tarda en abrirse completamente (puedes ajustarlo)
+        float duration = 2.0f; 
 
         while (elapsedTime < duration)
         {
-            // Interpola suavemente entre cerrada y abierta
             transform.localRotation = Quaternion.Slerp(closedRotation, openRotation, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
-            yield return null; // Espera al siguiente frame
+            yield return null; 
         }
 
-        // Nos aseguramos de que termine exactamente en la rotación final
+        // Garantizamos la precisiÃ³n posicional al finalizar la interpolaciÃ³n (evitando micro-desviaciones de coma flotante)
         transform.localRotation = openRotation;
-        Debug.Log("La puerta se ha abierto.");
+        Debug.Log("Evento: Puerta abierta con Ã©xito.");
     }
 }
