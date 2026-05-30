@@ -3,44 +3,45 @@ using UnityEngine.Events;
 
 public class MinijuegoLavabo : MonoBehaviour
 {
-    [Header("Ajustes del Minijuego")]
+    [Header("Mecánica de Lavado")]
+    [Tooltip("Estado booleano que determina si el paciente ha interactuado previamente con el jabón sólido.")]
     public bool manosEnjabonadas = false;
+    
+    [Tooltip("Tiempo de exposición continua requerido bajo el flujo de agua (en segundos).")]
     public float tiempoNecesario = 5f;
+    
     private float tiempoActual = 0f;
     private bool minijuegoTerminado = false;
 
-    [Header("Efectos Opcionales")]
+    [Header("Retroalimentación Sensorial")]
     public ParticleSystem particulasAgua;
     public AudioSource sonidoAgua;
 
-    [Header("Evento al Terminar")]
+    [Header("Eventos de Finalización")]
     public UnityEvent OnLavadoCompletado;
 
-    // Esta funci�n la llamar� la pastilla de jab�n al ser agarrada
     public void EnjabonarManos()
     {
         if (!minijuegoTerminado)
         {
             manosEnjabonadas = true;
-            Debug.Log("El ni�o se ha puesto jab�n.");
+            Debug.Log("Evento: Fase de enjabonado validada.");
         }
     }
 
     private void OnTriggerStay(Collider other)
     {
-        // Si ya ha terminado, no hacemos nada
         if (minijuegoTerminado) return;
 
-        // Comprobamos si lo que ha entrado en el grifo es una "Manos"
+        // Validación espacial de los avatares de las manos dentro de la zona de activación del grifo
         if (other.CompareTag("Manos"))
         {
             if (manosEnjabonadas)
             {
-                // Encendemos el agua (si tienes puestas part�culas o sonido)
                 if (particulasAgua != null && !particulasAgua.isPlaying) particulasAgua.Play();
                 if (sonidoAgua != null && !sonidoAgua.isPlaying) sonidoAgua.Play();
 
-                // Empezamos a contar el tiempo
+                // Acumulación del tiempo de permanencia requerido para validar la tarea terapéutica
                 tiempoActual += Time.deltaTime;
 
                 if (tiempoActual >= tiempoNecesario)
@@ -53,7 +54,7 @@ public class MinijuegoLavabo : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        // Si saca las manos antes de tiempo, paramos el agua
+        // Interrupción de los estímulos visuales y sonoros si el usuario retira las manos prematuramente
         if (other.CompareTag("Manos") && !minijuegoTerminado)
         {
             if (particulasAgua != null) particulasAgua.Stop();
@@ -65,13 +66,11 @@ public class MinijuegoLavabo : MonoBehaviour
     {
         minijuegoTerminado = true;
 
-        // Apagamos el grifo
         if (particulasAgua != null) particulasAgua.Stop();
         if (sonidoAgua != null) sonidoAgua.Stop();
 
-        Debug.Log("�Lavado completado!");
-
-        // Esto avisa al GameManager (o a lo que conectemos en Unity) de que ha terminado
+        Debug.Log("Evento: Rutina de higiene personal (Baño) completada con éxito.");
+        
         OnLavadoCompletado.Invoke();
     }
 }
