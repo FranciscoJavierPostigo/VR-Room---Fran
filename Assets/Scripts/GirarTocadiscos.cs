@@ -2,13 +2,12 @@ using UnityEngine;
 
 public class GirarTocadiscos : MonoBehaviour
 {
-    // Esta variable la podremos cambiar desde Unity para que gire m·s r·pido o m·s lento
+    [Header("Cinem√°tica del Tocadiscos")]
+    [Tooltip("Velocidad angular de rotaci√≥n en el eje Y (grados por segundo)")]
     public float velocidadGiro = 45f;
 
-    // Update se ejecuta continuamente, muchÌsimas veces por segundo
     void Update()
     {
-        // Le decimos al objeto que rote sobre su eje "Arriba" (Y) de forma suave (Time.deltaTime)
         transform.Rotate(Vector3.up * velocidadGiro * Time.deltaTime);
     }
 }
