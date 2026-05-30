@@ -2,46 +2,53 @@ using UnityEngine;
 
 public class TomarFoto : MonoBehaviour
 {
-    public Camera camaraLente;      // La c�mara que enfoca (el hijo)
-    public GameObject fotoPrefab;   // El papel en blanco (tu Prefab azul)
-    public Transform puntoSalida;   // Por d�nde sale la foto (el Empty frontal)
-    public AudioSource sonidoFoto;  // (Opcional) Sonido de disparo
+    [Header("Componentes de Captura")]
+    [Tooltip("Cámara secundaria encargada del renderizado a textura (RenderTexture).")]
+    public Camera camaraLente;
+    
+    [Tooltip("Prefabricado instanciable que actúa como soporte físico para la textura generada.")]
+    public GameObject fotoPrefab;
+    
+    [Tooltip("Transform de referencia para el punto de instanciación e impulso físico.")]
+    public Transform puntoSalida;
+
+    [Header("Retroalimentación Auditiva")]
+    public AudioSource sonidoFoto;
 
     public void DispararPolaroid()
     {
-        // Seguridad: Comprobamos que no falte nada por rellenar en el Inspector
+        // Validación de dependencias críticas antes de iniciar el volcado de memoria
         if (camaraLente == null || fotoPrefab == null || puntoSalida == null) return;
 
-        // 1. "Congelamos" la imagen que est� viendo la lente
+        // Extracción de la textura de renderizado actual del buffer de la cámara
         RenderTexture rt = camaraLente.targetTexture;
         if (rt == null) return;
 
         RenderTexture.active = rt;
 
-        // 2. Creamos una textura nueva y le pegamos los p�xeles
+        // Asignación en memoria de una nueva textura 2D y lectura del array de píxeles
         Texture2D fotoFinal = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
         fotoFinal.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
         fotoFinal.Apply();
         RenderTexture.active = null;
 
-        // 3. Imprimimos el papel en el mundo real (Instanciar)
+        // Instanciación del soporte físico en las coordenadas del dispensador
         GameObject nuevaFoto = Instantiate(fotoPrefab, puntoSalida.position, puntoSalida.rotation);
 
-        // 4. Le ponemos la imagen reci�n horneada a la foto
+        // Inyección dinámica de la textura generada en el material principal del objeto
         MeshRenderer renderer = nuevaFoto.GetComponent<MeshRenderer>();
         if (renderer != null)
         {
             renderer.material.mainTexture = fotoFinal;
         }
 
-        // 5. Escupimos la foto hacia afuera con las f�sicas
+        // Aplicación de un impulso físico direccional para simular la expulsión mecánica
         Rigidbody rb = nuevaFoto.GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.AddForce(puntoSalida.forward * 0.1f, ForceMode.Impulse);
         }
 
-        // 6. Reproducir sonido si le has puesto uno
         if (sonidoFoto != null) sonidoFoto.Play();
     }
 }
