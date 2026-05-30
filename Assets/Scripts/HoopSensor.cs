@@ -2,16 +2,30 @@ using UnityEngine;
 
 public class HoopSensor : MonoBehaviour
 {
-    public bool esElDeArriba; // Si es true, es el PreCheck. Si es false, es el de la Cesta.
+    [Header("Configuraci√≥n del Sensor")]
+    [Tooltip("Determina si este colisionador act√∫a como validador de entrada superior (PreCheck) o como registro final.")]
+    public bool esElDeArriba; 
+    
     private SalonGameManager manager;
 
-    void Start() { manager = Object.FindFirstObjectByType<SalonGameManager>(); }
+    void Start() 
+    { 
+        manager = Object.FindFirstObjectByType<SalonGameManager>(); 
+    }
+
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Balon")) // °Aseg˙rate de que la pelota tiene el tag "Balon"!
+        if (other.CompareTag("Balon")) 
         {
-            if (esElDeArriba) manager.BalonPorEncima();
-            else manager.RegistrarCanasta();
+            // Sistema de validaci√≥n en dos pasos para evitar falsos positivos (ej. encestar desde abajo)
+            if (esElDeArriba) 
+            {
+                manager.BalonPorEncima();
+            }
+            else 
+            {
+                manager.RegistrarCanasta();
+            }
         }
     }
 }
