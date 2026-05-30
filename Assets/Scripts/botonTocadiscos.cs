@@ -2,10 +2,11 @@ using UnityEngine;
 
 public class BotonTocadiscos : MonoBehaviour
 {
-    private AudioSource miAudio;
-
-    // Creamos un enchufe para conectar el script del plato que gira
+    [Header("Sincronización de Componentes")]
+    [Tooltip("Referencia al script de rotación para vincular la cinemática al estado de reproducción auditiva.")]
     public GirarTocadiscos scriptGiro;
+
+    private AudioSource miAudio;
 
     void Start()
     {
@@ -17,13 +18,15 @@ public class BotonTocadiscos : MonoBehaviour
         if (miAudio.isPlaying)
         {
             miAudio.Pause();
-            // Apagamos el motor de giro
+            
+            // Deshabilitamos la cinemática angular para mantener coherencia visual con la pausa auditiva
             if (scriptGiro != null) scriptGiro.enabled = false;
         }
         else
         {
             miAudio.Play();
-            // Encendemos el motor de giro
+            
+            // Reactivamos la cinemática en sincronía con el flujo de audio
             if (scriptGiro != null) scriptGiro.enabled = true;
         }
     }
