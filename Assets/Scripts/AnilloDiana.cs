@@ -2,12 +2,11 @@ using UnityEngine;
 
 public class AnilloDiana : MonoBehaviour
 {
-    [Header("Configuración de Puntos")]
-    [Tooltip("¿Cuántos puntos vale golpear este anillo específico?")]
+    [Header("ConfiguraciÃ³n de Puntos")]
+    [Tooltip("PuntuaciÃ³n otorgada por impactar en este anillo")]
     public int valorPuntos = 10;
 
-    [Header("Sonido Local")]
-    [Tooltip("Opcional: Sonido de 'pop' al golpear la diana")]
+    [Header("Audio")]
     public AudioClip sonidoImpacto;
     private AudioSource audioSource;
 
@@ -15,10 +14,8 @@ public class AnilloDiana : MonoBehaviour
 
     void Start()
     {
-        // Buscamos el GameManager automáticamente al empezar
         gameManager = FindObjectOfType<SalonGameManager>();
 
-        // Preparamos el AudioSource para el sonido local
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null && sonidoImpacto != null)
         {
@@ -26,22 +23,19 @@ public class AnilloDiana : MonoBehaviour
         }
     }
 
-    // Esta función detecta choques físicos (no triggers)
     void OnCollisionEnter(Collision collision)
     {
-        // Comprobamos si lo que nos ha chocado tiene el Tag "Proyectil"
         if (collision.gameObject.CompareTag("Proyectil"))
         {
-            // Sonido local de impacto
-            if (audioSource && sonidoImpacto) audioSource.PlayOneShot(sonidoImpacto);
+            if (audioSource && sonidoImpacto) 
+                audioSource.PlayOneShot(sonidoImpacto);
 
-            // Avisamos al GameManager y le pasamos nuestros puntos
             if (gameManager != null)
             {
                 gameManager.RegistrarImpactoDiana(valorPuntos);
             }
 
-            // Opcional: Destruir el dardo para no llenar la escena
+            // Destruimos el proyectil para evitar saturar la escena
             Destroy(collision.gameObject);
         }
     }
