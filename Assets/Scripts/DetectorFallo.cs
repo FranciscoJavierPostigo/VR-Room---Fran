@@ -2,19 +2,21 @@ using UnityEngine;
 
 public class DetectorFallo : MonoBehaviour
 {
-    [Header("Efecto de Error")]
+    [Header("RetroalimentaciÃ³n Visual")]
     public ParticleSystem particulasFallo;
 
-    [Header("¿Qué etiqueta (Tag) NO debería entrar aquí?")]
+    [Header("ConfiguraciÃ³n de Control")]
+    [Tooltip("Identificador Tag que activarÃ¡ la seÃ±al de error")]
     public string tagEquivocado;
 
     private void OnTriggerEnter(Collider other)
     {
-        // Si el objeto que entra tiene la etiqueta equivocada...
         if (other.gameObject.CompareTag(tagEquivocado))
         {
-            // Reproducimos las partículas amigables de error
-            particulasFallo.Play();
+            if (particulasFallo != null)
+            {
+                particulasFallo.Play();
+            }
         }
     }
 }
